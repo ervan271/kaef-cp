@@ -42,7 +42,7 @@ function Login() {
                 password: formLogin.password
                 }
             );
-            navigate('/dashboard');
+            navigate('/admin');
 
          } catch (error) {
             setError('Failed to login, please check your email and password')
