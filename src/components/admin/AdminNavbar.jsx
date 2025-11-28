@@ -1,5 +1,5 @@
-import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const AdminNavbar = ({ onToggleSidebar, sidebarOpen }) => {
   const { user, logout } = useAuth();
@@ -7,7 +7,7 @@ const AdminNavbar = ({ onToggleSidebar, sidebarOpen }) => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -18,7 +18,7 @@ const AdminNavbar = ({ onToggleSidebar, sidebarOpen }) => {
           className="btn btn-outline-secondary me-3"
           type="button"
           onClick={onToggleSidebar}
-          title={sidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
+          title={sidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
         >
           {sidebarOpen ? (
             <i className="bi bi-list fs-5"></i>
@@ -45,7 +45,7 @@ const AdminNavbar = ({ onToggleSidebar, sidebarOpen }) => {
                 height="32"
                 className="rounded-circle me-2"
               />
-              <span>{user?.name || user?.email || 'Admin'}</span>
+              <span>{user?.name || user?.email || "Admin"}</span>
             </a>
             <ul className="dropdown-menu dropdown-menu-end">
               <li>

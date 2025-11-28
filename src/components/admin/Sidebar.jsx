@@ -1,10 +1,10 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
   return (
     <div
-      className="flex-shrink-0 p-3 text-white d-flex flex-column bg-dark"
-      style={{ width: '250px', minHeight: '100vh' }}
+      className="d-flex flex-column vh-100"
+      style={{ width: "250px", backgroundColor: "#0b0242ff" }}
     >
       {/* Brand */}
       <NavLink
@@ -23,10 +23,10 @@ const Sidebar = () => {
           <NavLink
             to="/admin/dashboard"
             className={({ isActive }) =>
-              `nav-link text-white ${isActive ? 'active' : ''}`
+              `nav-link text-white ${isActive ? "active" : ""}`
             }
           >
-            <i className="bi bi-speedometer2 me-2"></i>
+            <i className="bi bi-house me-2"></i>
             Dashboard
           </NavLink>
         </li>
@@ -34,7 +34,7 @@ const Sidebar = () => {
           <NavLink
             to="/admin/users"
             className={({ isActive }) =>
-              `nav-link text-white ${isActive ? 'active' : ''}`
+              `nav-link text-white ${isActive ? "active" : ""}`
             }
           >
             <i className="bi bi-people me-2"></i>
@@ -45,7 +45,7 @@ const Sidebar = () => {
           <NavLink
             to="/admin/products"
             className={({ isActive }) =>
-              `nav-link text-white ${isActive ? 'active' : ''}`
+              `nav-link text-white ${isActive ? "active" : ""}`
             }
           >
             <i className="bi bi-box me-2"></i>
@@ -56,7 +56,7 @@ const Sidebar = () => {
           <NavLink
             to="/admin/orders"
             className={({ isActive }) =>
-              `nav-link text-white ${isActive ? 'active' : ''}`
+              `nav-link text-white ${isActive ? "active" : ""}`
             }
           >
             <i className="bi bi-cart me-2"></i>
@@ -65,9 +65,101 @@ const Sidebar = () => {
         </li>
         <li>
           <NavLink
+            to="/admin/orders"
+            className={({ isActive }) =>
+              `nav-link text-white ${isActive ? "active" : ""}`
+            }
+          >
+            <i className="bi bi-person-raised-hand me-2"></i>
+            Customers
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/admin/orders"
+            className={({ isActive }) =>
+              `nav-link text-white ${isActive ? "active" : ""}`
+            }
+          >
+            <i className="bi bi-file-person me-2"></i>
+            Employee
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/admin/orders"
+            className={({ isActive }) =>
+              `nav-link text-white ${isActive ? "active" : ""}`
+            }
+          >
+            <i className="bi bi-bank me-2"></i>
+            Unit Kerja
+          </NavLink>
+        </li>
+
+        <li className="nav-item">
+          <a
+            className="nav-link text-white d-flex justify-content-between align-items-center"
+            data-bs-toggle="collapse"
+            href="#masterDataMenu"
+            role="button"
+            aria-expanded="false"
+          >
+            <span>
+              <i className="bi bi-database me-2"></i> Master Obat
+            </span>
+            <i className="bi bi-chevron-down"></i>
+          </a>
+
+          <ul className="collapse nav flex-column" id="masterDataMenu">
+            <li>
+              <NavLink
+                to="/admin/master/obat"
+                className={({ isActive }) =>
+                  `nav-link text-white ${isActive ? "active" : ""}`
+                }
+              >
+                Detil Obat
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/master/obat"
+                className={({ isActive }) =>
+                  `nav-link text-white ${isActive ? "active" : ""}`
+                }
+              >
+                Kategori Obat
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/master/kategori"
+                className={({ isActive }) =>
+                  `nav-link text-white ${isActive ? "active" : ""}`
+                }
+              >
+                Golongan Obat
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/master/bentuk-sediaan"
+                className={({ isActive }) =>
+                  `nav-link text-white ${isActive ? "active" : ""}`
+                }
+              >
+                Bentuk Sediaan
+              </NavLink>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <NavLink
             to="/admin/settings"
             className={({ isActive }) =>
-              `nav-link text-white ${isActive ? 'active' : ''}`
+              `nav-link text-white ${isActive ? "active" : ""}`
             }
           >
             <i className="bi bi-gear me-2"></i>

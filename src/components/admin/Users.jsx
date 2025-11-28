@@ -1,236 +1,230 @@
-import { useState, useEffect } from 'react';
-import userService from '../../services/userService';
+import { useState, useEffect } from "react";
+import userService from "../../services/userService";
 
 const Users = () => {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        totalPages: 1,
-        total: 0,
-        limit: 10,
-        hasNextPage: false,
-        hasPrevPage: false,
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    total: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+
+  const [search, setSearch] = useState();
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchUsers(1, search); // Reset ke halaman 1
+  };
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState("add");
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    fullName: "",
+    role: "user",
+    isActive: true,
+  });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState(null);
+
+  const fetchUsers = async (page = 1, searchQuery = "") => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await userService.getAll({
+        page: page,
+        limit: pagination.limit,
+        search: searchQuery,
+      });
+      if (response.success) {
+        setUsers(response.data);
+        setPagination(response.pagination);
+      }
+    } catch (err) {
+      setError(err.message || "Gagal memuat data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handlePageChange = (newPage) => {
+    fetchUsers(newPage, search); // Pertahankan search query
+  };
+
+  // Handler buka modal tambah
+  const handleAdd = () => {
+    setModalMode("add");
+    setSelectedUser(null);
+    setFormData({
+      username: "",
+      email: "",
+      password: "",
+      fullName: "",
+      role: "user",
+      isActive: true,
     });
+    setFormError(null);
+    setShowModal(true);
+  };
 
-    const [search, setSearch] = useState();
-    const handleSearch = (e) => {
-        e.preventDefault();
-        fetchUsers(1, search);  // Reset ke halaman 1
-        };
+  // Handler buka modal edit
+  const handleEdit = (user) => {
+    setModalMode("edit");
+    setSelectedUser(user);
+    setFormData({
+      username: user.username,
+      email: user.email,
+      password: "", // Kosong, diisi jika ingin ganti password
+      fullName: user.fullName || "",
+      role: user.role,
+      isActive: user.isActive,
+    });
+    setFormError(null);
+    setShowModal(true);
+  };
 
-    const [showModal, setShowModal] = useState(false);
-    const [modalMode, setModalMode] = useState('add');
-    const [selectedUser, setSelectedUser] = useState(null);
+  // Handler tutup modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedUser(null);
+  };
 
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [userToDelete, setUserToDelete] = useState(null);
-    const [deleteLoading, setDeleteLoading] = useState(false);
-
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
-        fullName: '',
-        role: 'user',
-        isActive: true,
-        });
-    const [formLoading, setFormLoading] = useState(false);
-    const [formError, setFormError] = useState(null);
-
-    const fetchUsers = async (page = 1, searchQuery='') => {
-        try {
-        setLoading(true);
-        setError(null);
-        const response = await userService.getAll({
-            page: page,
-            limit: pagination.limit,
-            search: searchQuery,
-        });
-        if (response.success) {
-            setUsers(response.data);
-            setPagination(response.pagination);
-        }
-        } catch (err) {
-        setError(err.message || 'Gagal memuat data');
-        } finally {
-        setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-    
-    const handlePageChange = (newPage) => {
-        fetchUsers(newPage, search);  // Pertahankan search query
-        };
-
-        
-    // Handler buka modal tambah
-    const handleAdd = () => {
-        setModalMode('add');
-        setSelectedUser(null);
-        setFormData({
-            username: '',
-            email: '',
-            password: '',
-            fullName: '',
-            role: 'user',
-            isActive: true,
-        });
-        setFormError(null);
-        setShowModal(true);
-        };
-
-    // Handler buka modal edit
-    const handleEdit = (user) => {
-        setModalMode('edit');
-        setSelectedUser(user);
-        setFormData({
-            username: user.username,
-            email: user.email,
-            password: '', // Kosong, diisi jika ingin ganti password
-            fullName: user.fullName || '',
-            role: user.role,
-            isActive: user.isActive,
-        });
-        setFormError(null);
-        setShowModal(true);
-        };
-
-    // Handler tutup modal
-    const handleCloseModal = () => {
-        setShowModal(false);
-        setSelectedUser(null);
-        };
-    
-    // Handler perubahan input
-    const handleInputChange = (e) => {
+  // Handler perubahan input
+  const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value,
-        }));
-        };
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
-        
-    // Buka modal konfirmasi hapus
-    const handleDeleteClick = (user) => {
-        setUserToDelete(user);
-        setShowDeleteModal(true);
-        };
+  // Buka modal konfirmasi hapus
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
+    setShowDeleteModal(true);
+  };
 
-     // Tutup modal konfirmasi hapus
-    const handleCloseDeleteModal = () => {
-        setShowDeleteModal(false);
-        setUserToDelete(null);
-        };
+  // Tutup modal konfirmasi hapus
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setUserToDelete(null);
+  };
 
-    // Eksekusi hapus
-    const handleDeleteConfirm = async () => {
-        try {
-            setDeleteLoading(true);
-            await userService.delete(userToDelete.id);
+  // Eksekusi hapus
+  const handleDeleteConfirm = async () => {
+    try {
+      setDeleteLoading(true);
+      await userService.delete(userToDelete.id);
 
-            handleCloseDeleteModal();
-            fetchUsers(pagination.page, search);
-        } catch (err) {
-            alert(err.message || 'Gagal menghapus user');
-        } finally {
-            setDeleteLoading(false);
+      handleCloseDeleteModal();
+      fetchUsers(pagination.page, search);
+    } catch (err) {
+      alert(err.message || "Gagal menghapus user");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setFormLoading(true);
+      setFormError(null);
+
+      if (modalMode === "add") {
+        // Validasi untuk tambah
+        if (!formData.username || !formData.email || !formData.password) {
+          setFormError("Username, email, dan password wajib diisi");
+          return;
         }
-        };
-
-        
-
-    const handleSubmit = async () => {
-        try {
-            setFormLoading(true);
-            setFormError(null);
-
-            if (modalMode === 'add') {
-            // Validasi untuk tambah
-            if (!formData.username || !formData.email || !formData.password) {
-                setFormError('Username, email, dan password wajib diisi');
-                return;
-            }
-            await userService.create(formData);
-            } else {
-            // Mode edit
-            // Validasi untuk edit
-            if (!formData.username || !formData.email) {
-                setFormError('Username dan email wajib diisi');
-                return;
-            }
-
-            // Siapkan data untuk update
-            const updateData = { ...formData };
-
-            // Hapus password jika kosong (tidak ingin diubah)
-            if (!updateData.password) {
-                delete updateData.password;
-            }
-
-            await userService.update(selectedUser.id, updateData);
-            }
-
-            // Tutup modal dan refresh data
-            handleCloseModal();
-            fetchUsers(pagination.page, search); // Tetap di halaman yang sama
-        } catch (err) {
-            setFormError(err.message || 'Gagal menyimpan data');
-        } finally {
-            setFormLoading(false);
+        await userService.create(formData);
+      } else {
+        // Mode edit
+        // Validasi untuk edit
+        if (!formData.username || !formData.email) {
+          setFormError("Username dan email wajib diisi");
+          return;
         }
-        };
 
+        // Siapkan data untuk update
+        const updateData = { ...formData };
+
+        // Hapus password jika kosong (tidak ingin diubah)
+        if (!updateData.password) {
+          delete updateData.password;
+        }
+
+        await userService.update(selectedUser.id, updateData);
+      }
+
+      // Tutup modal dan refresh data
+      handleCloseModal();
+      fetchUsers(pagination.page, search); // Tetap di halaman yang sama
+    } catch (err) {
+      setFormError(err.message || "Gagal menyimpan data");
+    } finally {
+      setFormLoading(false);
+    }
+  };
 
   return (
     <div>
       {/* Header */}
       <div className="mb-4 d-flex justify-content-between align-items-center">
         <div>
-            <h1 className="mb-0 h3">Users</h1>
-            <p className="text-muted">Daftar semua pengguna</p>
+          <h1 className="mb-0 h3">Users</h1>
+          <p className="text-muted">Daftar semua pengguna</p>
         </div>
-        <button className='btn btn-primary' onClick={handleAdd}>
-        <i className='bi bi-plus-lg me-2'></i> Tambah User
-      </button>
+        <button className="btn btn-primary" onClick={handleAdd}>
+          <i className="bi bi-plus-lg me-2"></i> Tambah User
+        </button>
       </div>
-      
 
       {/* Search Form */}
-    <div className="mb-4">
-    <form onSubmit={handleSearch} className="d-flex gap-2">
-        <input
-        type="text"
-        className="form-control"
-        placeholder="Cari username atau email..."
-        value={search || ""}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ maxWidth: '300px' }}
-        />
-        
-        <button type="submit" className="btn btn-light">
-        <i className="bi bi-search me-2"></i>Cari
-        </button>
+      <div className="mb-4">
+        <form onSubmit={handleSearch} className="d-flex gap-2">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Cari username atau email..."
+            value={search || ""}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ maxWidth: "300px" }}
+          />
 
-        {search && (
-        <button
-            type="button"
-            className="btn btn-light"
-            onClick={() => {
-            setSearch("");          // kosongkan input
-            fetchUsers(1, "");      // load semua data page 1
-            }}
-        >
-            Reset
-        </button>
-        )}
-    </form>
-    </div>
+          <button type="submit" className="btn btn-light">
+            <i className="bi bi-search me-2"></i>Cari
+          </button>
+
+          {search && (
+            <button
+              type="button"
+              className="btn btn-light"
+              onClick={() => {
+                setSearch(""); // kosongkan input
+                fetchUsers(1, ""); // load semua data page 1
+              }}
+            >
+              Reset
+            </button>
+          )}
+        </form>
+      </div>
 
       {/* Error Alert */}
       {error && (
@@ -261,7 +255,7 @@ const Users = () => {
                     <th>Nama Lengkap</th>
                     <th>Role</th>
                     <th>Status</th>
-                    <th style={{ width: '120px' }}>Aksi</th>
+                    <th style={{ width: "120px" }}>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -279,13 +273,11 @@ const Users = () => {
                         </td>
                         <td>{user.username}</td>
                         <td>{user.email}</td>
-                        <td>{user.fullName || '-'}</td>
+                        <td>{user.fullName || "-"}</td>
                         <td>
                           <span
                             className={`badge ${
-                              user.role === 'admin'
-                                ? 'bg-info'
-                                : 'bg-warning'
+                              user.role === "admin" ? "bg-info" : "bg-warning"
                             }`}
                           >
                             {user.role}
@@ -294,27 +286,27 @@ const Users = () => {
                         <td>
                           <span
                             className={`badge ${
-                              user.isActive ? 'bg-success' : 'bg-secondary'
+                              user.isActive ? "bg-success" : "bg-secondary"
                             }`}
                           >
-                            {user.isActive ? 'Active' : 'Inactive'}
+                            {user.isActive ? "Active" : "Inactive"}
                           </span>
                         </td>
                         <td>
-                            <button
-                                className="btn btn-sm btn-outline-primary me-1"
-                                title="Edit"
-                                onClick={() => handleEdit(user)}
-                            >
-                                <i className="bi bi-pencil"></i>
-                            </button>
-                            <button
-                                className="btn btn-sm btn-outline-danger"
-                                title="Hapus"
-                                onClick={() => handleDeleteClick(user)}
-                            >
-                                <i className="bi bi-trash"></i>
-                            </button>
+                          <button
+                            className="btn btn-sm btn-outline-primary me-1"
+                            title="Edit"
+                            onClick={() => handleEdit(user)}
+                          >
+                            <i className="bi bi-pencil"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            title="Hapus"
+                            onClick={() => handleDeleteClick(user)}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -328,7 +320,11 @@ const Users = () => {
           {pagination.totalPages > 1 && (
             <nav className="mt-4">
               <ul className="pagination justify-content-center">
-                <li className={`page-item ${!pagination.hasPrevPage ? 'disabled' : ''}`}>
+                <li
+                  className={`page-item ${
+                    !pagination.hasPrevPage ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="page-link"
                     onClick={() => handlePageChange(pagination.page - 1)}
@@ -341,7 +337,7 @@ const Users = () => {
                   <li
                     key={i + 1}
                     className={`page-item ${
-                      pagination.page === i + 1 ? 'active' : ''
+                      pagination.page === i + 1 ? "active" : ""
                     }`}
                   >
                     <button
@@ -352,7 +348,11 @@ const Users = () => {
                     </button>
                   </li>
                 ))}
-                <li className={`page-item ${!pagination.hasNextPage ? 'disabled' : ''}`}>
+                <li
+                  className={`page-item ${
+                    !pagination.hasNextPage ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="page-link"
                     onClick={() => handlePageChange(pagination.page + 1)}
@@ -372,20 +372,19 @@ const Users = () => {
         </>
       )}
 
-      
       {/* Modal Tambah/Edit User */}
       {showModal && (
         <div
           className="modal show d-block"
           tabIndex="-1"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         >
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {modalMode === 'add'
-                    ? 'Tambah User'
+                  {modalMode === "add"
+                    ? "Tambah User"
                     : `Edit User: ${selectedUser?.username}`}
                 </h5>
                 <button
@@ -434,8 +433,8 @@ const Users = () => {
 
                 <div className="mb-3">
                   <label htmlFor="password" className="form-label">
-                    Password{' '}
-                    {modalMode === 'add' && (
+                    Password{" "}
+                    {modalMode === "add" && (
                       <span className="text-danger">*</span>
                     )}
                   </label>
@@ -447,9 +446,9 @@ const Users = () => {
                     value={formData.password}
                     onChange={handleInputChange}
                     placeholder={
-                      modalMode === 'edit'
-                        ? 'Kosongkan jika tidak diubah'
-                        : 'Masukkan password'
+                      modalMode === "edit"
+                        ? "Kosongkan jika tidak diubah"
+                        : "Masukkan password"
                     }
                   />
                 </div>
@@ -521,10 +520,10 @@ const Users = () => {
                       <span className="spinner-border spinner-border-sm me-2"></span>
                       Menyimpan...
                     </>
-                  ) : modalMode === 'add' ? (
-                    'Simpan'
+                  ) : modalMode === "add" ? (
+                    "Simpan"
                   ) : (
-                    'Update'
+                    "Update"
                   )}
                 </button>
               </div>
@@ -538,7 +537,7 @@ const Users = () => {
         <div
           className="modal show d-block"
           tabIndex="-1"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         >
           <div className="modal-dialog modal-sm">
             <div className="modal-content">
@@ -552,7 +551,7 @@ const Users = () => {
               </div>
               <div className="modal-body">
                 <p className="mb-0">
-                  Apakah Anda yakin ingin menghapus user{' '}
+                  Apakah Anda yakin ingin menghapus user{" "}
                   <strong>{userToDelete?.username}</strong>?
                 </p>
               </div>
@@ -577,7 +576,7 @@ const Users = () => {
                       Menghapus...
                     </>
                   ) : (
-                    'Hapus'
+                    "Hapus"
                   )}
                 </button>
               </div>
